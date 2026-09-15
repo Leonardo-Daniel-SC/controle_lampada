@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+.indicador-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* LED */
+.led {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* LED ligado */
+.led-verde {
+    background: #22c55e;
+
+    box-shadow:
+        0 0 5px #22c55e,
+        0 0 15px #22c55e,
+        0 0 30px rgba(34, 197, 94, 0.7);
+
+    animation: pulsar-verde 2s infinite;
+}
+
+/* LED desligado */
+.led-vermelho {
+    background: #ef4444;
+
+    box-shadow:
+        0 0 5px #ef4444,
+        0 0 12px rgba(239, 68, 68, 0.5);
+}
+
+/* LED de erro */
+.led-cinza {
+    background: #6b7280;
+
+    box-shadow:
+        0 0 5px #6b7280;
+}
+
+/* Brilho suave do LED verde */
+@keyframes pulsar-verde {
+
+    0% {
+        box-shadow:
+            0 0 5px #22c55e,
+            0 0 15px #22c55e,
+            0 0 25px rgba(34, 197, 94, 0.5);
+    }
+
+    50% {
+        box-shadow:
+            0 0 8px #22c55e,
+            0 0 20px #22c55e,
+            0 0 40px rgba(34, 197, 94, 0.8);
+    }
+
+    100% {
+        box-shadow:
+            0 0 5px #22c55e,
+            0 0 15px #22c55e,
+            0 0 25px rgba(34, 197, 94, 0.5);
+    }
+}

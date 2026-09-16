@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+
     if (req.method !== "POST") {
         return res.status(405).json({
             erro: "Método não permitido"
@@ -6,6 +7,7 @@ export default async function handler(req, res) {
     }
 
     try {
+
         const {
             servidor,
             caminho,
@@ -50,16 +52,25 @@ export default async function handler(req, res) {
             url
         });
 
+        // Headers básicos
+        const headers = {
+            "fiware-service": "smart",
+            "fiware-servicepath": "/",
+            "accept": "application/json"
+        };
+
+        // Content-Type somente quando existe payload
+        if (metodo !== "GET" && metodo !== "DELETE") {
+            headers["Content-Type"] = "application/json";
+        }
+
         const resposta = await fetch(url, {
             method: metodo,
-            headers: {
-                "Content-Type": "application/json",
-                "fiware-service": "smart",
-                "fiware-servicepath": "/",
-                "accept": "application/json"
-            },
+            headers,
             body:
-                metodo !== "GET" && body
+                metodo !== "GET" &&
+                metodo !== "DELETE" &&
+                body
                     ? JSON.stringify(body)
                     : undefined
         });
@@ -71,19 +82,27 @@ export default async function handler(req, res) {
             resposta: texto
         });
 
-        // Tenta devolver JSON quando a resposta for JSON
         try {
+
             const dados = JSON.parse(texto);
 
-            return res.status(resposta.status).json(dados);
+            return res
+                .status(resposta.status)
+                .json(dados);
 
         } catch {
-            return res.status(resposta.status).send(texto);
+
+            return res
+                .status(resposta.status)
+                .send(texto);
         }
 
     } catch (erro) {
 
-        console.error("Erro no proxy FIWARE:", erro);
+        console.error(
+            "Erro no proxy FIWARE:",
+            erro
+        );
 
         return res.status(500).json({
             erro: "Não foi possível conectar ao servidor FIWARE",

@@ -7,7 +7,7 @@ const ControleLampada = () => {
     const ligarLampada = async () => {
         try {
             const resposta = await fetch(
-                "http://98.91.20.39d:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
+                "http://98.91.20.39:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
                 {
                     method: "PATCH",
                     headers: {

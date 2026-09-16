@@ -255,14 +255,18 @@ html {
     }
 
     .container-card h1 {
-        font-size: 24px;
+        font-size: 20px;
     }
 
     .card__status {
-        font-size: 22px;
+        font-size: 20px;
     }
 
     .card__luminosidade {
-        font-size: 22px;
+        font-size: 20px;
+    }
+
+    .led-cinza {
+        width: 35%;
     }
 }

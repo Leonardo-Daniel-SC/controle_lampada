@@ -108,7 +108,7 @@ const ControleLampada = () => {
             setStatus("Erro ao enviar comando");
         }
     };
-    
+
     const consultarLuminosidade = async () => {
         try {
 
@@ -161,7 +161,7 @@ const ControleLampada = () => {
                 <div className="card-section"> 
                     <div className="card-informacoes">
                         <div className="card-servidor">
-                            <p className="servidor-titulo">Ip do servidor</p>
+                            <p className="servidor-titulo">IP do servidor</p>
                             <input type="text" name="" id="" className="caixa-ip"
                             placeholder="Ex: 98.91.20.39:1026" value={servidor} 
                             onChange={(evento) => setServidor(evento.target.value)} />

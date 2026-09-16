@@ -300,7 +300,7 @@ html {
     .container-card {
         width: 100%;
         max-width: 370px;
-        margin: 170px auto;
+        margin: 70px auto;
     }
 
     .container-card h1 {
@@ -338,6 +338,6 @@ html {
 
     .box {
         max-width: 550px;
-        width: 100%;
+        width: 90%;
     }
 }

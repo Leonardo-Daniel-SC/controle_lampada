@@ -21,10 +21,8 @@ const ControleLampada = () => {
     };
 
     const chamarFiware = async (caminho, opcoes = {}) => {
-
         // Quando estiver publicado no Vercel
         if (import.meta.env.PROD) {
-
             const dados = {
                 servidor: servidor.trim(),
                 caminho: caminho,
@@ -33,9 +31,7 @@ const ControleLampada = () => {
                     ? JSON.parse(opcoes.body)
                     : undefined
             };
-
             console.log("Enviando para Vercel:", dados);
-
             return fetch("/api/fiware", {
                 method: "POST",
                 headers: {
@@ -111,7 +107,6 @@ const ControleLampada = () => {
 
     const consultarLuminosidade = async () => {
         try {
-
             const resposta = await chamarFiware(
                 "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity",
                 {
@@ -123,23 +118,16 @@ const ControleLampada = () => {
                     }
                 }
             );
-
             console.log("Status da consulta:", resposta.status);
-
             const texto = await resposta.text();
-
             console.log("Resposta recebida:", texto);
-
             if (!resposta.ok) {
                 throw new Error(
                     `Erro ao consultar luminosidade: ${resposta.status} - ${texto}`
                 );
             }
-
             const dados = JSON.parse(texto);
-
             console.log("Dados do FIWARE:", dados);
-
             setLuminosidade(dados.value);
 
         } catch (erro) {

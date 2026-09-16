@@ -330,10 +330,17 @@ html {
 
     .caixa-ip {
         font-size: 15px;
+        width: 95%;
+    }
+
+    .card-informacoes {
+        justify-content: space-between;
     }
 
     .btn-cnt {
-    margin-top: 10px;
+        margin-top: 10px;
+        width: 45%;
+        margin-right: 0;
     }
 
     .box {

@@ -3,31 +3,52 @@ import { useState } from "react";
 const ControleLampada = () => {
     const [status, setStatus] = useState("Desligada");
     const [luminosidade, setLuminosidade] = useState(0);
-
     // Recupera o último servidor salvo no navegador
     const [servidor, setServidor] = useState( () => 
         localStorage.getItem("fiware-servidor") || "" );
-
     // Conecta ao servidor informado
     const conectarServidor = () => { 
         if (!servidor.trim()) { alert("Digite o IP do servidor."); 
         return; 
         }
-
     // Salva o IP para não precisar digitar novamente
     localStorage.setItem("fiware-servidor", servidor.trim()); 
     alert("Servidor configurado!"); 
     };
-
     // Monta o endereço do FIWARE 
-    const getFiwareUrl = () => { 
-        return `http://${servidor.trim()}`; 
+    const getFiwareUrl = () => {
+        return `http://${servidor.trim()}`;
+    };
+
+    const chamarFiware = async (caminho, opcoes = {}) => {
+        // Quando estiver publicado no Vercel
+        if (import.meta.env.PROD) {
+            return fetch("/api/fiware", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    servidor: servidor.trim(),
+                    caminho: caminho,
+                    metodo: opcoes.method || "GET",
+                    body: opcoes.body
+                        ? JSON.parse(opcoes.body)
+                        : undefined
+                })
+            });
+        }
+        // Quando estiver rodando com npm run dev
+        return fetch(
+            `${getFiwareUrl()}${caminho}`,
+            opcoes
+        );
     };
 
     const ligarLampada = async () => {
         try {
-            const resposta = await fetch(
-                `${getFiwareUrl()}/v2/entities/urn:ngsi-ld:Lamp:002/attrs`,
+            const resposta = await chamarFiware(
+                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
                 {
                     method: "PATCH",
                     headers: {
@@ -54,8 +75,8 @@ const ControleLampada = () => {
     };
     const desligarLampada = async () => {
         try {
-            const resposta = await fetch(
-                `${getFiwareUrl()}/v2/entities/urn:ngsi-ld:Lamp:002/attrs`,
+            const resposta = await chamarFiware(
+                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
                 {
                     method: "PATCH",
                     headers: {
@@ -82,8 +103,8 @@ const ControleLampada = () => {
     };
     const consultarLuminosidade = async () => {
         try {
-            const resposta = await fetch(
-                `${getFiwareUrl()}/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity`,
+            const resposta = await chamarFiware(
+                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity",
                 {
                     method: "GET",
 

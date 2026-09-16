@@ -7,7 +7,7 @@ const ControleLampada = () => {
     const ligarLampada = async () => {
         try {
             const resposta = await fetch(
-                "http://54.224.122.27:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
+                "http://98.91.20.39:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
                 {
                     method: "PATCH",
                     headers: {
@@ -35,7 +35,7 @@ const ControleLampada = () => {
     const desligarLampada = async () => {
         try {
             const resposta = await fetch(
-                "http://54.224.122.27:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
+                "http://98.91.20.39:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
                 {
                     method: "PATCH",
                     headers: {
@@ -63,7 +63,7 @@ const ControleLampada = () => {
     const consultarLuminosidade = async () => {
         try {
             const resposta = await fetch(
-                "http://54.224.122.27:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity",
+                "http://98.91.20.39:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity",
                 {
                     method: "GET",
 

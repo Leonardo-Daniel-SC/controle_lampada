@@ -23,19 +23,21 @@ const ControleLampada = () => {
     const chamarFiware = async (caminho, opcoes = {}) => {
         // Quando estiver publicado no Vercel
         if (import.meta.env.PROD) {
+            const dados = {
+                servidor: servidor.trim(),
+                caminho: caminho,
+                metodo: opcoes.method || "GET",
+                body: opcoes.body
+                    ? JSON.parse(opcoes.body)
+                    : undefined
+            };
+            console.log("Enviando para Vercel:", dados);
             return fetch("/api/fiware", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    servidor: servidor.trim(),
-                    caminho: caminho,
-                    metodo: opcoes.method || "GET",
-                    body: opcoes.body
-                        ? JSON.parse(opcoes.body)
-                        : undefined
-                })
+                body: JSON.stringify(dados)
             });
         }
         // Quando estiver rodando com npm run dev
@@ -106,26 +108,20 @@ const ControleLampada = () => {
             const resposta = await chamarFiware(
                 "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity",
                 {
-                    method: "GET",
-
-                    headers: {
-                        "fiware-service": "smart",
-                        "fiware-servicepath": "/",
-                        "accept": "application/json"
-                    }
+                    method: "GET"
                 }
             );
-
+            console.log("Status da consulta:", resposta.status);
+            const texto = await resposta.text();
+            console.log("Resposta da Vercel:", texto);
             if (!resposta.ok) {
-                throw new Error("Erro ao consultar luminosidade");
+                throw new Error(
+                    `Erro ao consultar luminosidade: ${resposta.status} - ${texto}`
+                );
             }
-
-            const dados = await resposta.json();
-
-            console.log("Resposta do FIWARE:", dados);
-
+            const dados = JSON.parse(texto);
+            console.log("Dados do FIWARE:", dados);
             setLuminosidade(dados.value);
-
         } catch (erro) {
             console.error(erro);
         }

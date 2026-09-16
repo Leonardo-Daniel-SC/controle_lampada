@@ -13,6 +13,13 @@ export default async function handler(req, res) {
             body
         } = req.body || {};
 
+        console.log("Dados recebidos pela Vercel:", {
+            servidor,
+            caminho,
+            metodo,
+            body
+        });
+
         if (!servidor) {
             return res.status(400).json({
                 erro: "Servidor não informado"

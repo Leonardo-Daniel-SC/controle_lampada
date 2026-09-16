@@ -123,6 +123,10 @@ html {
     margin: 80px auto;
     border-radius: 20px;
     border: 1px solid ; 
+    box-shadow:
+        0 0 5px #2F3E46,
+        0 0 15px #2F3E46,
+        0 0 30px rgba(0, 67, 190, 0.482);
 }
 
 .container-card h1 {
@@ -146,9 +150,9 @@ html {
 .lista-status {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 30px;
-    margin-bottom: 40px;
+    margin: 30px 40px 50px 40px;
     transform: translateY(10px);
 }
 
@@ -202,7 +206,6 @@ html {
 .btn-on:hover {
     background-color: #00b40cbe;
     color: rgb(225, 224, 224);
-
 }
 
 
@@ -247,10 +250,56 @@ html {
     color: rgb(252, 170, 47);
 }
 
+.card-informacoes {
+    display: flex;
+    flex-direction: row;
+}
+
+.btn-cnt {
+    margin-top: 20px;
+    height: 100%;
+    width: 50%;
+    background-color: #003194;
+    box-shadow: 0 2px 4px rgba(2, 12, 151, 0.975);
+    transition: all 0.3s ease;
+}
+
+.btn-cnt:hover {
+    background-color: #000f85;
+}
+
+.card-servidor {
+    width: 55%;
+}
+
+.servidor-titulo {
+    text-align: center;
+    margin-right: 12px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #ffffffca;
+}
+
+.caixa-ip {
+    text-align: center;
+    width: 95%;
+    border: solid 2px #ffffff8c;
+    border-radius: 8px;
+    font-size: 20px;
+    color: #ffffffca;
+}
+
+.box {
+    width: 100%;
+    max-width: 550px;
+    margin: 80px auto;
+    border-radius: 20px;
+}
+
 @media (max-width: 850px) {
     .container-card {
         width: 100%;
-        max-width: 350px;
+        max-width: 370px;
         margin: 170px auto;
     }
 
@@ -262,11 +311,33 @@ html {
         font-size: 20px;
     }
 
+    .lista-status {
+        justify-content: center;
+        margin: 30px 0 50px 0;
+    }
+
     .card__luminosidade {
         font-size: 20px;
     }
 
     .led-cinza {
         width: 35%;
+    }
+
+    .servidor-titulo {
+        font-size: 16px;
+    }
+
+    .caixa-ip {
+        font-size: 16px;
+    }
+
+    .btn-cnt {
+    margin-top: 10px;
+    }
+
+    .box {
+        max-width: 550px;
+        width: 100%;
     }
 }

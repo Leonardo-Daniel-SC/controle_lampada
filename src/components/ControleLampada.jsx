@@ -7,7 +7,7 @@ const ControleLampada = () => {
     const ligarLampada = async () => {
         try {
             const resposta = await fetch(
-                "http://98.93.19.142:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
+                "http://54.224.122.27:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
                 {
                     method: "PATCH",
                     headers: {
@@ -35,7 +35,7 @@ const ControleLampada = () => {
     const desligarLampada = async () => {
         try {
             const resposta = await fetch(
-                "http://98.93.19.142:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
+                "http://54.224.122.27:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
                 {
                     method: "PATCH",
                     headers: {
@@ -63,7 +63,7 @@ const ControleLampada = () => {
     const consultarLuminosidade = async () => {
         try {
             const resposta = await fetch(
-                "http://98.93.19.142:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity",
+                "http://54.224.122.27:1026/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity",
                 {
                     method: "GET",
 
@@ -92,21 +92,37 @@ const ControleLampada = () => {
 
     // PÁGINA
     return ( 
-        <div className="container-card ">
+        <div className="container-card">
             <h1>Controle da Lâmpada</h1>
-            <span className={`led ${
-                status === "Ligada"
-                ? "led-verde"
-                : status === "Desligada"
-                ? "led-vermelho"
-                : "led-cinza"
-                }`}>
-            </span>
-            <span className="card__status">Status: {status}</span>
-            <button className="card__btn" onClick={ligarLampada}>Ligar lâmpada</button>
-            <button className="card__btn" onClick={desligarLampada}>Desligar lâmpada</button>
-            <button className="card__btn" onClick={consultarLuminosidade}>Consultar luminosidade</button>
-            <p className="card__luminosidade">Nível de luminosidade: {luminosidade}</p>
+
+            <div className="card-section"> 
+                <div className="lista-status">
+                    <span className={`led ${
+                        status === "Ligada"
+                        ? "led-verde"
+                        : status === "Desligada"
+                        ? "led-vermelho"
+                        : "led-cinza"
+                    }`}/>
+                    <span className="card__status">Status: {status}</span>
+                </div>
+
+                <div className="btn-grupo">
+                    <div className="btn-row-top">
+                        <button className="card__btn btn-on" onClick={ligarLampada}>Ligar lâmpada</button>
+                        <button className="card__btn btn-off" onClick={desligarLampada}>Desligar lâmpada</button>
+                    </div>
+                    <button className="card__btn btn-cons" onClick={consultarLuminosidade}>Consultar luminosidade</button>
+                </div>
+            </div>
+
+            <div className="card-section">
+                <div className="container-luminosidade">
+                    <p className="card__luminosidade">Nível de luminosidade: <span>{luminosidade}</span></p>
+                </div>
+            </div>
+
+
         </div>
     );
 };

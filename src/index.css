@@ -1,4 +1,23 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+    --cor-primaria: #000;
+    --cor-secundaria: #263239;
+    --cor-background: #1B263B;
+    --cor-card: #2F3E46;
+    --cor-hover: #000B58;
+    --fonte-primaria: "Poppins", sans-serif;
+}
+
+*{
+    font-family: var(--fonte-primaria);
+    font-size: 24px;
+}
+
+html {
+    background-color: var(--cor-background);
+}
 
 .indicador-status {
     display: flex;
@@ -8,8 +27,8 @@
 
 /* LED */
 .led {
-    width: 18px;
-    height: 18px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     display: inline-block;
     position: relative;
@@ -34,7 +53,10 @@
 
     box-shadow:
         0 0 5px #ef4444,
-        0 0 12px rgba(239, 68, 68, 0.5);
+        0 0 15px #ef4444,
+        0 0 30px rgba(239, 68, 68, 0.5);
+        
+    animation: pulsar-vermelho 2s infinite;
 }
 
 /* LED de erro */
@@ -67,5 +89,180 @@
             0 0 5px #22c55e,
             0 0 15px #22c55e,
             0 0 25px rgba(34, 197, 94, 0.5);
+    }
+}
+
+@keyframes pulsar-vermelho {
+
+    0% {
+        box-shadow:
+            0 0 5px #ef4444,
+            0 0 15px #ef4444,
+            0 0 25px rgba(239, 68, 68, 0.5);
+    }
+
+    50% {
+        box-shadow:
+            0 0 8px #ef4444,
+            0 0 20px #ef4444,
+            0 0 40px rgba(239, 68, 68, 0.8);
+    }
+
+    100% {
+        box-shadow:
+            0 0 5px #ef4444,
+            0 0 15px #ef4444,
+            0 0 25px rgba(239, 68, 68, 0.5);
+    }
+}
+
+.container-card {
+    background: var(--cor-card);
+    width: 100%;
+    max-width: 550px;
+    margin: 80px auto;
+    border-radius: 20px;
+    border: 1px solid ; 
+}
+
+.container-card h1 {
+    font-size: 40px;
+    text-align: center;
+    padding: 18px;
+    margin: 0;
+    font-weight: bold;
+    color: #ffffff;
+    background: var(--cor-secundaria);
+    border-bottom: 1px solid ;
+    border-radius: 20px 20px 0 0;
+
+}
+
+.card-section {
+    padding: 18px 25px;
+    
+}
+
+.lista-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 40px;
+    transform: translateY(10px);
+}
+
+.led {
+    width: 70px;
+    height: 70px;
+}
+
+.card__status {
+    font-size: 35px;
+    font-weight: 700;
+    max-width: 300px;
+    color: #ffffffca;
+}
+
+.btn-grupo {
+    display: flex;
+    flex-direction: column;    
+    gap: 10px;
+}
+
+.btn-row-top {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-row-top .card__btn {
+    flex: 1;
+}
+
+.card__btn {
+    padding: 10px 16px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #ffffff;
+}
+
+.card__btn:active {
+    transform: scale(0.95);
+}
+
+.btn-on {
+    background-color: #0edb2a;
+    box-shadow: 0 2px 4px rgba(3, 89, 6, 0.626);
+    transition: all 0.3s ease;
+}
+
+.btn-on:hover {
+    background-color: #00b40cbe;
+    color: rgb(225, 224, 224);
+
+}
+
+
+.btn-off {
+    background-color: #ef4444;
+    box-shadow: 0 2px 4px rgba(255, 0, 0, 0.626);
+    transition: all 0.3s ease;
+}
+
+.btn-off:hover {
+    background-color: #ff1d1d96;
+    color: rgb(225, 224, 224);
+}
+
+
+.btn-cons {
+    width: 100%;
+    background-color: rgb(255, 183, 0);
+    box-shadow: 0 2px 4px rgba(162, 121, 8, 0.975);
+    transition: all 0.3s ease;
+}
+
+.btn-cons:hover {
+    background-color: rgba(255, 158, 3, 0.737);
+    color: rgb(225, 224, 224);
+}
+
+.container-luminosidade {
+    display: flex;
+    justify-content: center;
+    gap: 10px; 
+}
+
+.card__luminosidade {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 400;
+    color: #ffffffca;
+}
+
+.card__luminosidade span {
+    color: rgb(252, 170, 47);
+}
+
+@media (max-width: 850px) {
+    .container-card {
+        width: 100%;
+        max-width: 350px;
+        margin: 170px auto;
+    }
+
+    .container-card h1 {
+        font-size: 24px;
+    }
+
+    .card__status {
+        font-size: 22px;
+    }
+
+    .card__luminosidade {
+        font-size: 22px;
     }
 }

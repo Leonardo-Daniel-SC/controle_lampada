@@ -268,13 +268,7 @@ O funcionamento do projeto pode ser dividido em ligar ou desligar a lâmpada e c
 </details>
 <br/>
 
-## 🌐 Aplicação Web
-
-A interface foi desenvolvida para simplificar a interação do usuário com a Smart Lamp.
-
-A aplicação possui:
-
-### 🖥️ Configuração do servidor
+## 🖥️ Configuração do servidor
 
 O usuário informa o endereço do servidor FIWARE:
 

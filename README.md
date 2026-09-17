@@ -10,9 +10,7 @@
 
 ## 📋 Sobre o Projeto
 
-O **Smart Lamp** é um projeto de Internet das Coisas (IoT) desenvolvido com o objetivo de controlar e monitorar uma lâmpada inteligente por meio de uma aplicação web.
-
-O projeto foi desenvolvido com base na **PoC (Proof of Concept) Smart Lamp** apresentada no material **FIWARE Descomplicado**, que utiliza um **ESP32** integrado à plataforma FIWARE para representar uma lâmpada conectada.
+O **Smart Lamp** é um projeto de Internet das Coisas (IoT), desenvolvido com base na **PoC (Proof of Concept) Smart Lamp** apresentada no material **FIWARE Descomplicado**, que utiliza um **ESP32** integrado à plataforma FIWARE para representar uma lâmpada conectada.
 
 Como extensão da proposta original, este projeto possui uma interface web desenvolvida em **React e JavaScript**, permitindo que o usuário interaja com a lâmpada e consulte informações do dispositivo de maneira visual e intuitiva.
 
@@ -98,7 +96,7 @@ A solução é composta por diferentes camadas responsáveis pela comunicação 
 O funcionamento do projeto pode ser dividido em ligar ou desligar a lâmpada e consultar luminosidade.
 
 <details>
-  <summary>🔍 Saiba mais sobre o funcionamento </summary>
+  <summary>🔍 Saiba mais sobre o funcionamento: </summary>
 
 
   ### 💡 Controle da lâmpada
@@ -191,7 +189,6 @@ O funcionamento do projeto pode ser dividido em ligar ou desligar a lâmpada e c
 ![MQTT](https://img.shields.io/badge/MQTT-00BC45?style=for-the-badge\&logo=MQTT\&logoColor=white)
 ![React](https://img.shields.io/badge/React-000?style=for-the-badge\&logo=React\&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge\&logo=javascript\&logoColor=black)
-![Vite](https://img.shields.io/badge/Vite-000?style=for-the-badge\&logo=Vite\&logoColor=white\&color=purple)
 ![Vercel](https://img.shields.io/badge/Vercel-000?style=for-the-badge\&logo=Vercel\&logoColor=white)
 ![Postman](https://img.shields.io/badge/Postman-FF880F?style=for-the-badge\&logo=postman\&logoColor=white)
 
@@ -220,7 +217,7 @@ O funcionamento do projeto pode ser dividido em ligar ou desligar a lâmpada e c
 
   ## 🔗 FIWARE
 
-  O FIWARE é utilizado como plataforma para gerenciamento dos dados contextuais da aplicação.
+  O FIWARE é utilizado como plataforma para gerenciamento dos dados da aplicação.
 
   A plataforma fornece componentes chamados **Generic Enablers (GEs)**, incluindo o Orion Context Broker e IoT Agents.
 
@@ -325,7 +322,7 @@ A API recebe informações como:
 
 ## 📁 Estrutura do Projeto
 
-Uma estrutura aproximada da aplicação é:
+Estrutura aproximada da aplicação:
 
 ```text
 Smart-Lamp/
@@ -487,8 +484,8 @@ Este projeto foi desenvolvido tendo como referência a documentação **FIWARE D
 |Nome|RM|
 |---|---|
 |Bernardo Suk JU|568968|
-|Leonardo Danie|574142|
-|Matheus Tamatay|572842|
+|Leonardo Daniel|574142|
+|Matheus Tamataya|572842|
 |Vinycius Lu|569300|
 <br/>
 

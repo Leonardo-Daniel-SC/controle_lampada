@@ -36,31 +36,36 @@ const ControleLampada = () => {
     };
 
     // Monta o endereço do FIWARE 
-    const getHost = () =>
-        servidor.trim().replace(/^https?:\/\//, "").split(":")[0];
+    const getFiwareUrl = () => {
+        return `http://${servidor.trim()}`;
+    };
 
-    const chamarFiware = async (caminho, opcoes = {}, porta = null) => {
-        // Se não informar porta, usa exatamente o que foi digitado no campo
-        const destino = porta ? `${getHost()}:${porta}` : servidor.trim();
-
+    const chamarFiware = async (caminho, opcoes = {}) => {
         // Quando estiver publicado no Vercel
         if (import.meta.env.PROD) {
             const dados = {
-                servidor: destino,
+                servidor: servidor.trim(),
                 caminho: caminho,
                 metodo: opcoes.method || "GET",
-                body: opcoes.body ? JSON.parse(opcoes.body) : undefined
+                body: opcoes.body
+                    ? JSON.parse(opcoes.body)
+                    : undefined
             };
             console.log("Enviando para Vercel:", dados);
             return fetch("/api/fiware", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify(dados)
             });
         }
 
         // Quando estiver rodando localmente
-        return fetch(`http://${destino}${caminho}`, opcoes);
+        return fetch(
+            `${getFiwareUrl()}${caminho}`,
+            opcoes
+        );
     };
 
     const ligarLampada = async () => {
@@ -124,7 +129,7 @@ const ControleLampada = () => {
     const consultarLuminosidade = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity",
+                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosidade",
                 {
                     method: "GET",
                     headers: {
@@ -154,7 +159,7 @@ const ControleLampada = () => {
     const consultarTemperatura = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/temperature",
+                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/temperatura",
                 {
                     method: "GET",
                     headers: {
@@ -184,7 +189,7 @@ const ControleLampada = () => {
     const consultarUmidade = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/humidity",
+                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/umidade",
                 {
                     method: "GET",
                     headers: {
@@ -448,7 +453,7 @@ const ControleLampada = () => {
                     </div>
                     {mensagemDevice && <p className="card__status">{mensagemDevice}</p>}
                 </div>
-                
+
             </div>
         </div>
     );

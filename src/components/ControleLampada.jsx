@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const ControleLampada = ({ onDeviceCreated }) => {
+const ControleLampada = ({ onDeviceCreated, onDeviceDeleted }) => {
 
     // const [status, setStatus] = useState("Desligada");
     const [novoDeviceId, setNovoDeviceId] = useState("");
@@ -230,6 +230,7 @@ const ControleLampada = ({ onDeviceCreated }) => {
             if (!okOu404(r3)) throw new Error(`Orion: ${r3.status}`);
 
             setMensagemDevice(`Dispositivo ${deviceId} deletado.`);
+            onDeviceDeleted(id);
             setNovoDeviceId("");
         } catch (erro) {
             console.error(erro);

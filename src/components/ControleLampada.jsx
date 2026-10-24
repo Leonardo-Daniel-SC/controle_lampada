@@ -230,7 +230,6 @@ const ControleLampada = () => {
             setMensagemDevice("Criando device...");
 
             // 1. Provisiona o device no IoT Agent (porta 4041)
-            //    409 = já existe, o que não é erro
             const respDevice = await chamarFiware(
                 "/iot/devices",
                 {
@@ -261,55 +260,38 @@ const ControleLampada = () => {
                 4041
             );
 
-            if (!respDevice.ok && respDevice.status !== 409) {
+            if (!respDevice.ok) {
                 const texto = await respDevice.text();
                 throw new Error(`IoT Agent (${respDevice.status}): ${texto}`);
             }
 
-            // 2. Verifica se já existe registro de comandos para essa entidade (porta 1026)
-            const rLista = await chamarFiware(
+            // 2. Registra os comandos on/off no Orion (porta 1026)
+            const respReg = await chamarFiware(
                 "/v2/registrations",
-                { method: "GET", headers: { ...HEADERS_FIWARE, accept: "application/json" } },
+                {
+                    method: "POST",
+                    headers: HEADERS_FIWARE_JSON,
+                    body: JSON.stringify({
+                        description: `Lamp Commands ${deviceId}`,
+                        dataProvided: {
+                            entities: [{ id: entityName, type: "Lamp" }],
+                            attrs: ["on", "off"]
+                        },
+                        provider: {
+                            http: { url: `http://${getHost()}:4041` },
+                            legacyForwarding: true
+                        }
+                    })
+                },
                 1026
             );
-            const registros = rLista.ok ? await rLista.json() : [];
-            const jaRegistrado = registros.some((reg) =>
-                reg.dataProvided?.entities?.some((e) => e.id === entityName)
-            );
 
-            // 3. Só cria o registro se ainda não existir
-            if (!jaRegistrado) {
-                const respReg = await chamarFiware(
-                    "/v2/registrations",
-                    {
-                        method: "POST",
-                        headers: HEADERS_FIWARE_JSON,
-                        body: JSON.stringify({
-                            description: `Lamp Commands ${deviceId}`,
-                            dataProvided: {
-                                entities: [{ id: entityName, type: "Lamp" }],
-                                attrs: ["on", "off"]
-                            },
-                            provider: {
-                                http: { url: `http://${getHost()}:4041` },
-                                legacyForwarding: true
-                            }
-                        })
-                    },
-                    1026
-                );
-
-                if (!respReg.ok) {
-                    const texto = await respReg.text();
-                    throw new Error(`Registro de comandos (${respReg.status}): ${texto}`);
-                }
+            if (!respReg.ok) {
+                const texto = await respReg.text();
+                throw new Error(`Registro de comandos (${respReg.status}): ${texto}`);
             }
 
-            setMensagemDevice(
-                respDevice.status === 409
-                    ? `Device ${deviceId} já existia; registro de comandos verificado.`
-                    : `Device ${deviceId} criado e registrado.`
-            );
+            setMensagemDevice(`Device ${deviceId} criado e registrado.`);
             setNovoDeviceId("");
         } catch (erro) {
             console.error(erro);

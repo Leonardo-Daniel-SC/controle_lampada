@@ -4,7 +4,7 @@ const HistoricoGrafico = ({ titulo, unidade, pontos, cor }) => {
     const dados = pontos.slice(-30);
 
     if (dados.length === 0) {
-        return <div className="historico-grafico"><h3>{titulo}</h3><p>Nenhuma leitura encontrada na AWS.</p></div>;
+        return <div className="historico-grafico"><h3>{titulo}</h3><p>Nenhuma leitura encontrada no histórico do STH-Comet.</p></div>;
     }
 
     const valores = dados.map((ponto) => ponto.valor);
@@ -271,7 +271,7 @@ const Card = ({ id, titulo }) => {
 
         const entidade = `urn:ngsi-ld:Lamp:${id}`;
         const consultarAtributoHistorico = async (atributo) => {
-            const caminho = `/STH/v2/entities/${encodeURIComponent(entidade)}/attrs/${atributo}?type=Lamp&lastN=30`;
+            const caminho = `/STH/v1/contextEntities/type/Lamp/id/${entidade}/attributes/${atributo}?lastN=30`;
             const resposta = await chamarFiware(caminho, {
                 method: "GET",
                 headers: { ...HEADERS_FIWARE, accept: "application/json" },
@@ -283,12 +283,17 @@ const Card = ({ id, titulo }) => {
             }
 
             const respostaJson = await resposta.json();
-            const valores = respostaJson.values ?? respostaJson.contextResponses
-                ?.flatMap((contexto) => contexto.contextElement?.attributes ?? [])
-                .find((item) => item.name === atributo)?.values ?? [];
+            const atributos = respostaJson.contextResponses?.flatMap(
+                (contexto) => contexto.contextElement?.attributes ?? []
+            ) ?? [];
+            const atributoHistorico = atributos.find((item) => item.name === atributo);
+            const valores = respostaJson.values ?? atributoHistorico?.values ?? [];
 
             return valores
-                .map((item) => ({ data: item.recvTime, valor: Number(item.attrValue) }))
+                .map((item) => ({
+                    data: item.recvTime ?? item.timestamp ?? item.time,
+                    valor: Number(item.attrValue ?? item.value),
+                }))
                 .filter((item) => item.data && Number.isFinite(item.valor))
                 .sort((a, b) => new Date(a.data) - new Date(b.data));
         };
@@ -367,9 +372,11 @@ const Card = ({ id, titulo }) => {
                     </div>
                 </div>
             </div>
-            <button className="card__btn btn-cons btn-novo" onClick={exibirHistorico}>
-                {historicoAberto ? "Fechar histórico" : "Analisar histórico"}
-            </button>
+            <div className='container-btn'>
+                <button className="card__btn btn-cons btn-novo" onClick={exibirHistorico}>
+                    {historicoAberto ? "Fechar histórico" : "Analisar histórico"}
+                </button>
+            </div>    
             {historicoAberto && (
                 <section className="historico-painel" aria-live="polite">
                     <h2>Histórico — {titulo}</h2>

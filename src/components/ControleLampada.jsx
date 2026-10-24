@@ -36,36 +36,31 @@ const ControleLampada = () => {
     };
 
     // Monta o endereço do FIWARE 
-    const getFiwareUrl = () => {
-        return `http://${servidor.trim()}`;
-    };
+    const getHost = () =>
+        servidor.trim().replace(/^https?:\/\//, "").split(":")[0];
 
-    const chamarFiware = async (caminho, opcoes = {}) => {
+    const chamarFiware = async (caminho, opcoes = {}, porta = null) => {
+        // Se não informar porta, usa exatamente o que foi digitado no campo
+        const destino = porta ? `${getHost()}:${porta}` : servidor.trim();
+
         // Quando estiver publicado no Vercel
         if (import.meta.env.PROD) {
             const dados = {
-                servidor: servidor.trim(),
+                servidor: destino,
                 caminho: caminho,
                 metodo: opcoes.method || "GET",
-                body: opcoes.body
-                    ? JSON.parse(opcoes.body)
-                    : undefined
+                body: opcoes.body ? JSON.parse(opcoes.body) : undefined
             };
             console.log("Enviando para Vercel:", dados);
             return fetch("/api/fiware", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(dados)
             });
         }
 
         // Quando estiver rodando localmente
-        return fetch(
-            `${getFiwareUrl()}${caminho}`,
-            opcoes
-        );
+        return fetch(`http://${destino}${caminho}`, opcoes);
     };
 
     const ligarLampada = async () => {

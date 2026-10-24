@@ -1,0 +1,21 @@
+{
+  "devices": [
+    {
+      "device_id": "lamp002",
+      "entity_name": "urn:ngsi-ld:Lamp:002",
+      "entity_type": "Lamp",
+      "protocol": "PDI-IoTA-UltraLight",
+      "transport": "MQTT",
+      "commands": [
+        { "name": "on", "type": "command" },
+        { "name": "off", "type": "command" }
+      ],
+      "attributes": [
+        { "object_id": "s", "name": "state", "type": "Text" },
+        { "object_id": "l", "name": "luminosity", "type": "Integer" },
+        { "object_id": "t", "name": "temperature", "type": "Float" },
+        { "object_id": "h", "name": "humidity", "type": "Float" }
+      ]
+    }
+  ]
+}

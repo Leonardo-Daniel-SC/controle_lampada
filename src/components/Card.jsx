@@ -64,7 +64,7 @@ const Card = ({ id, titulo }) => {
     const ligarLampada = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:001/attrs",
+                `/v2/entities/urn:ngsi-ld:Lamp:${id}/attrs`,
                 {
                     method: "PATCH",
                     headers: {
@@ -93,7 +93,7 @@ const Card = ({ id, titulo }) => {
     const desligarLampada = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:001/attrs",
+                `/v2/entities/urn:ngsi-ld:Lamp:${id}/attrs`,
                 {
                     method: "PATCH",
                     headers: {
@@ -122,7 +122,7 @@ const Card = ({ id, titulo }) => {
     const consultarLuminosidade = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:001/attrs/luminosity",
+                `/v2/entities/urn:ngsi-ld:Lamp:${id}/attrs/luminosity`,
                 {
                     method: "GET",
                     headers: {
@@ -152,7 +152,7 @@ const Card = ({ id, titulo }) => {
     const consultarTemperatura = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:001/attrs/temperature",
+                `/v2/entities/urn:ngsi-ld:Lamp:${id}/attrs/temperature`,
                 {
                     method: "GET",
                     headers: {
@@ -182,7 +182,7 @@ const Card = ({ id, titulo }) => {
     const consultarUmidade = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:001/attrs/humidity",
+                `/v2/entities/urn:ngsi-ld:Lamp:${id}/attrs/humidity`,
                 {
                     method: "GET",
                     headers: {

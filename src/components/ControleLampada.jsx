@@ -159,15 +159,15 @@ const ControleLampada = ({ onDeviceCreated }) => {
                     ? `Dispositivo ${deviceId} já existia; registro de comandos verificado.`
                     : `Dispositivo ${deviceId} criado e registrado.`
             );
+            onDeviceCreated({
+                id,
+                titulo: `Dispositivo ${id}`,
+            });
             setNovoDeviceId("");
         } catch (erro) {
             console.error(erro);
             setMensagemDevice(`Erro ao criar Dispositivo: ${erro.message}`);
         }
-        onDeviceCreated({
-            id,
-            titulo: `Dispositivo ${id}`,
-        });
     };
 
     const deletarDevice = async () => {

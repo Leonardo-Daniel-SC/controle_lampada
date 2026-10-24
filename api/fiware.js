@@ -23,13 +23,22 @@ export default async function handler(req, res) {
                 erro: "Servidor não informado"
             });
         }
-        // Aceita somente IPv4 com a porta 1026
-        const formatoIP = /^(\d{1,3}\.){3}\d{1,3}:1026$/;
-        if (!formatoIP.test(servidor)) {
+        // Aceita IPv4 somente com as portas do FIWARE:
+        // 1026 = Orion, 4041 = IoT Agent, 8666 = STH-Comet
+        const PORTAS_PERMITIDAS = ["1026", "4041", "8666"];
+        const formatoIP = /^(\d{1,3}\.){3}\d{1,3}:\d{2,5}$/;
+        const porta = String(servidor).split(":")[1];
+
+        if (!formatoIP.test(servidor) || !PORTAS_PERMITIDAS.includes(porta)) {
             return res.status(400).json({
-                erro: "Servidor inválido. Use o formato IP:1026"
+                erro: `Servidor inválido. Use IP:porta (portas: ${PORTAS_PERMITIDAS.join(", ")})`
             });
         }
+
+        if (typeof caminho !== "string" || !caminho.startsWith("/")) {
+            return res.status(400).json({ erro: "Caminho inválido" });
+        }
+
         const partes = servidor.split(":")[0].split(".");
 
         if (partes.some(numero => Number(numero) > 255)) {

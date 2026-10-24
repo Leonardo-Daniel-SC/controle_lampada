@@ -66,7 +66,7 @@ const ControleLampada = () => {
     const ligarLampada = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
+                "/v2/entities/urn:ngsi-ld:Lamp:001/attrs",
                 {
                     method: "PATCH",
                     headers: {
@@ -95,7 +95,7 @@ const ControleLampada = () => {
     const desligarLampada = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs",
+                "/v2/entities/urn:ngsi-ld:Lamp:001/attrs",
                 {
                     method: "PATCH",
                     headers: {
@@ -124,7 +124,7 @@ const ControleLampada = () => {
     const consultarLuminosidade = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity",
+                "/v2/entities/urn:ngsi-ld:Lamp:001/attrs/luminosity",
                 {
                     method: "GET",
                     headers: {
@@ -154,7 +154,7 @@ const ControleLampada = () => {
     const consultarTemperatura = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/temperature",
+                "/v2/entities/urn:ngsi-ld:Lamp:001/attrs/temperature",
                 {
                     method: "GET",
                     headers: {
@@ -184,7 +184,7 @@ const ControleLampada = () => {
     const consultarUmidade = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/humidity",
+                "/v2/entities/urn:ngsi-ld:Lamp:001/attrs/humidity",
                 {
                     method: "GET",
                     headers: {

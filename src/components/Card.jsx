@@ -50,6 +50,7 @@ const Card = ({ id, titulo }) => {
     const [historicoAberto, setHistoricoAberto] = useState(false);
     const [carregandoHistorico, setCarregandoHistorico] = useState(false);
     const [erroHistorico, setErroHistorico] = useState("");
+    const [mensagemHistorico, setMensagemHistorico] = useState("");
 
     const HEADERS_FIWARE = {
         "fiware-service": "smart",
@@ -253,6 +254,58 @@ const Card = ({ id, titulo }) => {
         }
     };
 
+    const garantirAssinaturaHistorico = async (entidade) => {
+        const atributosHistorico = ["luminosity", "temperature", "humidity"];
+        const urlNotificacao = `http://${getHost()}:8666/notify`;
+        const respostaLista = await chamarFiware(
+            "/v2/subscriptions",
+            { method: "GET", headers: { ...HEADERS_FIWARE, accept: "application/json" } },
+            1026
+        );
+
+        if (!respostaLista.ok) {
+            const texto = await respostaLista.text();
+            throw new Error(`Não foi possível verificar a assinatura do histórico (${respostaLista.status}): ${texto}`);
+        }
+
+        const assinaturas = await respostaLista.json();
+        const jaConfigurada = assinaturas.some((assinatura) =>
+            assinatura.subject?.entities?.some((item) => item.id === entidade) &&
+            assinatura.notification?.http?.url === urlNotificacao &&
+            atributosHistorico.every((atributo) => assinatura.notification?.attrs?.includes(atributo))
+        );
+
+        if (jaConfigurada) return false;
+
+        const respostaCriacao = await chamarFiware(
+            "/v2/subscriptions",
+            {
+                method: "POST",
+                headers: HEADERS_FIWARE_JSON,
+                body: JSON.stringify({
+                    description: `Histórico ${entidade}`,
+                    subject: {
+                        entities: [{ id: entidade, type: "Lamp" }],
+                        condition: { attrs: atributosHistorico },
+                    },
+                    notification: {
+                        http: { url: urlNotificacao },
+                        attrs: atributosHistorico,
+                        attrsFormat: "legacy",
+                    },
+                }),
+            },
+            1026
+        );
+
+        if (!respostaCriacao.ok) {
+            const texto = await respostaCriacao.text();
+            throw new Error(`Não foi possível ativar o histórico (${respostaCriacao.status}): ${texto}`);
+        }
+
+        return true;
+    };
+
     const exibirHistorico = async () => {
         if (historicoAberto) {
             setHistoricoAberto(false);
@@ -268,6 +321,7 @@ const Card = ({ id, titulo }) => {
         setHistoricoAberto(true);
         setCarregandoHistorico(true);
         setErroHistorico("");
+        setMensagemHistorico("");
 
         const entidade = `urn:ngsi-ld:Lamp:${id}`;
         const consultarAtributoHistorico = async (atributo) => {
@@ -299,12 +353,16 @@ const Card = ({ id, titulo }) => {
         };
 
         try {
+            const assinaturaCriada = await garantirAssinaturaHistorico(entidade);
             const [luminosity, temperature, humidity] = await Promise.all([
                 consultarAtributoHistorico("luminosity"),
                 consultarAtributoHistorico("temperature"),
                 consultarAtributoHistorico("humidity"),
             ]);
             setHistorico({ luminosity, temperature, humidity });
+            if (assinaturaCriada) {
+                setMensagemHistorico("Captura do histórico ativada. As próximas leituras enviadas pelo dispositivo aparecerão aqui.");
+            }
         } catch (erro) {
             console.error(erro);
             setErroHistorico(erro.message || "Não foi possível carregar o histórico da AWS.");
@@ -373,7 +431,7 @@ const Card = ({ id, titulo }) => {
                 </div>
             </div>
             <div className='container-btn'>
-                <button className="card__btn btn-cons btn-novo" onClick={exibirHistorico}>
+                <button className="card__btn btn-cons btn-novo pb-2" onClick={exibirHistorico}>
                     {historicoAberto ? "Fechar histórico" : "Analisar histórico"}
                 </button>
             </div>    
@@ -382,6 +440,7 @@ const Card = ({ id, titulo }) => {
                     <h2>Histórico — {titulo}</h2>
                     {carregandoHistorico && <p>Buscando leituras na AWS...</p>}
                     {erroHistorico && <p className="historico-erro">{erroHistorico}</p>}
+                    {mensagemHistorico && <p className="historico-mensagem">{mensagemHistorico}</p>}
                     {!carregandoHistorico && !erroHistorico && (
                         <div className="historico-graficos">
                             <HistoricoGrafico titulo="Luminosidade" unidade="lx" pontos={historico.luminosity} cor="#fca22f" />

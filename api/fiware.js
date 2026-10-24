@@ -94,7 +94,8 @@ export default async function handler(req, res) {
         );
         return res.status(500).json({
             erro: "Não foi possível conectar ao servidor FIWARE",
-            detalhe: erro.message
+            detalhe: erro.message,
+            causa: erro.cause?.code || erro.cause?.message
         });
     }
 }

@@ -124,7 +124,7 @@ const ControleLampada = () => {
     const consultarLuminosidade = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosidade",
+                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/luminosity",
                 {
                     method: "GET",
                     headers: {
@@ -154,7 +154,7 @@ const ControleLampada = () => {
     const consultarTemperatura = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/temperatura",
+                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/temperature",
                 {
                     method: "GET",
                     headers: {
@@ -184,7 +184,7 @@ const ControleLampada = () => {
     const consultarUmidade = async () => {
         try {
             const resposta = await chamarFiware(
-                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/umidade",
+                "/v2/entities/urn:ngsi-ld:Lamp:002/attrs/humidity",
                 {
                     method: "GET",
                     headers: {

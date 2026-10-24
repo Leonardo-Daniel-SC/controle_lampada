@@ -4,6 +4,7 @@ import Home from "./pages/Home"
 import Header from "./components/Header"
 import Footer from "./components/Footer"
 import { useEffect, useState } from "react";
+import Historico from "./pages/Historico"
 
 const App = () => {
   const [dispositivos, setDispositivos] = useState(() => {

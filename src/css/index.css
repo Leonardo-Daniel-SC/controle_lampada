@@ -315,10 +315,6 @@ html {
     padding: 10px;
 }
 
-.destaque {
-    
-}
-
 @media (max-width: 850px) {
     .container-card {
         width: 100%;

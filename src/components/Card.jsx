@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const HistoricoGrafico = ({ titulo, unidade, pontos, cor }) => {
     const dados = pontos.slice(-30);
@@ -51,6 +51,9 @@ const Card = ({ id, titulo }) => {
     const [carregandoHistorico, setCarregandoHistorico] = useState(false);
     const [erroHistorico, setErroHistorico] = useState("");
     const [mensagemHistorico, setMensagemHistorico] = useState("");
+    const [pollingAtivo, setPollingAtivo] = useState(false);
+    const atualizarHistoricoRef = useRef(null);
+    const atualizacaoEmAndamentoRef = useRef(false);
 
     const HEADERS_FIWARE = {
         "fiware-service": "smart",
@@ -105,6 +108,67 @@ const Card = ({ id, titulo }) => {
         // Quando estiver rodando localmente
         return fetch(`http://${destino}${caminho}`, opcoes);
     };
+
+    const consultarAtributoHistorico = async (entidade, atributo) => {
+        const caminho = `/STH/v1/contextEntities/type/Lamp/id/${entidade}/attributes/${atributo}?lastN=30`;
+        const resposta = await chamarFiware(caminho, {
+            method: "GET",
+            headers: { ...HEADERS_FIWARE, accept: "application/json" },
+        }, 8666);
+
+        if (!resposta.ok) {
+            const texto = await resposta.text();
+            throw new Error(`Falha ao consultar ${atributo} (${resposta.status}): ${texto}`);
+        }
+
+        const respostaJson = await resposta.json();
+        const atributos = respostaJson.contextResponses?.flatMap(
+            (contexto) => contexto.contextElement?.attributes ?? []
+        ) ?? [];
+        const atributoHistorico = atributos.find((item) => item.name === atributo);
+        const valores = respostaJson.values ?? atributoHistorico?.values ?? [];
+
+        return valores
+            .map((item) => ({
+                data: item.recvTime ?? item.timestamp ?? item.time,
+                valor: Number(item.attrValue ?? item.value),
+            }))
+            .filter((item) => item.data && Number.isFinite(item.valor))
+            .sort((a, b) => new Date(a.data) - new Date(b.data));
+    };
+
+    const atualizarHistorico = async () => {
+        if (atualizacaoEmAndamentoRef.current) return;
+        atualizacaoEmAndamentoRef.current = true;
+        const entidade = `urn:ngsi-ld:Lamp:${id}`;
+        try {
+            const [luminosity, temperature, humidity] = await Promise.all([
+                consultarAtributoHistorico(entidade, "luminosity"),
+                consultarAtributoHistorico(entidade, "temperature"),
+                consultarAtributoHistorico(entidade, "humidity"),
+            ]);
+            setHistorico({ luminosity, temperature, humidity });
+            setErroHistorico("");
+        } catch (erro) {
+            console.error(erro);
+            setErroHistorico(erro.message || "Não foi possível atualizar o histórico da AWS.");
+        } finally {
+            setCarregandoHistorico(false);
+            atualizacaoEmAndamentoRef.current = false;
+        }
+    };
+
+    atualizarHistoricoRef.current = atualizarHistorico;
+
+    useEffect(() => {
+        if (!historicoAberto || !pollingAtivo) return undefined;
+
+        const intervalo = window.setInterval(() => {
+            atualizarHistoricoRef.current?.();
+        }, 10000);
+
+        return () => window.clearInterval(intervalo);
+    }, [historicoAberto, pollingAtivo]);
 
     const ligarLampada = async () => {
         try {
@@ -309,6 +373,7 @@ const Card = ({ id, titulo }) => {
     const exibirHistorico = async () => {
         if (historicoAberto) {
             setHistoricoAberto(false);
+            setPollingAtivo(false);
             return;
         }
 
@@ -324,42 +389,11 @@ const Card = ({ id, titulo }) => {
         setMensagemHistorico("");
 
         const entidade = `urn:ngsi-ld:Lamp:${id}`;
-        const consultarAtributoHistorico = async (atributo) => {
-            const caminho = `/STH/v1/contextEntities/type/Lamp/id/${entidade}/attributes/${atributo}?lastN=30`;
-            const resposta = await chamarFiware(caminho, {
-                method: "GET",
-                headers: { ...HEADERS_FIWARE, accept: "application/json" },
-            }, 8666);
-
-            if (!resposta.ok) {
-                const texto = await resposta.text();
-                throw new Error(`Falha ao consultar ${atributo} (${resposta.status}): ${texto}`);
-            }
-
-            const respostaJson = await resposta.json();
-            const atributos = respostaJson.contextResponses?.flatMap(
-                (contexto) => contexto.contextElement?.attributes ?? []
-            ) ?? [];
-            const atributoHistorico = atributos.find((item) => item.name === atributo);
-            const valores = respostaJson.values ?? atributoHistorico?.values ?? [];
-
-            return valores
-                .map((item) => ({
-                    data: item.recvTime ?? item.timestamp ?? item.time,
-                    valor: Number(item.attrValue ?? item.value),
-                }))
-                .filter((item) => item.data && Number.isFinite(item.valor))
-                .sort((a, b) => new Date(a.data) - new Date(b.data));
-        };
 
         try {
             const assinaturaCriada = await garantirAssinaturaHistorico(entidade);
-            const [luminosity, temperature, humidity] = await Promise.all([
-                consultarAtributoHistorico("luminosity"),
-                consultarAtributoHistorico("temperature"),
-                consultarAtributoHistorico("humidity"),
-            ]);
-            setHistorico({ luminosity, temperature, humidity });
+            await atualizarHistorico();
+            setPollingAtivo(true);
             if (assinaturaCriada) {
                 setMensagemHistorico("Captura do histórico ativada. As próximas leituras enviadas pelo dispositivo aparecerão aqui.");
             }
@@ -438,10 +472,11 @@ const Card = ({ id, titulo }) => {
             {historicoAberto && (
                 <section className="historico-painel" aria-live="polite">
                     <h2>Histórico — {titulo}</h2>
+                    <p className="historico-atualizacao">Atualização automática a cada 10 segundos enquanto este painel estiver aberto.</p>
                     {carregandoHistorico && <p>Buscando leituras na AWS...</p>}
                     {erroHistorico && <p className="historico-erro">{erroHistorico}</p>}
                     {mensagemHistorico && <p className="historico-mensagem">{mensagemHistorico}</p>}
-                    {!carregandoHistorico && !erroHistorico && (
+                    {!carregandoHistorico && (
                         <div className="historico-graficos">
                             <HistoricoGrafico titulo="Luminosidade" unidade="lx" pontos={historico.luminosity} cor="#fca22f" />
                             <HistoricoGrafico titulo="Temperatura" unidade="°C" pontos={historico.temperature} cor="#ef6461" />

@@ -435,3 +435,9 @@ html {
     color: #ffd27a;
     overflow-wrap: anywhere;
 }
+
+.historico-atualizacao {
+    margin: 0 0 12px;
+    color: #ffffff9c;
+    font-size: 13px;
+}

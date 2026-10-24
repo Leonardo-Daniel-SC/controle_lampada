@@ -1,4 +1,44 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+
+const HistoricoGrafico = ({ titulo, unidade, pontos, cor }) => {
+    const dados = pontos.slice(-30);
+
+    if (dados.length === 0) {
+        return <div className="historico-grafico"><h3>{titulo}</h3><p>Nenhuma leitura encontrada na AWS.</p></div>;
+    }
+
+    const valores = dados.map((ponto) => ponto.valor);
+    const minimo = Math.min(...valores);
+    const maximo = Math.max(...valores);
+    const amplitude = maximo - minimo || 1;
+    const coordenadas = dados.map((ponto, indice) => ({
+        ...ponto,
+        x: dados.length === 1 ? 160 : 24 + (indice * 272) / (dados.length - 1),
+        y: 112 - ((ponto.valor - minimo) / amplitude) * 88,
+    }));
+    const linha = coordenadas.map((ponto) => `${ponto.x},${ponto.y}`).join(" ");
+
+    return (
+        <div className="historico-grafico">
+            <h3>{titulo}</h3>
+            <svg viewBox="0 0 320 140" role="img" aria-label={`Histórico de ${titulo}`}>
+                <line x1="24" y1="112" x2="296" y2="112" className="historico-eixo" />
+                <line x1="24" y1="20" x2="24" y2="112" className="historico-eixo" />
+                <polyline points={linha} fill="none" stroke={cor} strokeWidth="3" />
+                {coordenadas.map((ponto, indice) => (
+                    <circle key={`${ponto.data}-${indice}`} cx={ponto.x} cy={ponto.y} r="4" fill={cor}>
+                        <title>{`${new Date(ponto.data).toLocaleString("pt-BR")}: ${ponto.valor} ${unidade}`}</title>
+                    </circle>
+                ))}
+            </svg>
+            <div className="historico-legenda">
+                <span>Mínimo: {minimo} {unidade}</span>
+                <span>Máximo: {maximo} {unidade}</span>
+            </div>
+            <small>{new Date(dados[0].data).toLocaleString("pt-BR")} — {new Date(dados[dados.length - 1].data).toLocaleString("pt-BR")}</small>
+        </div>
+    );
+};
 
 
 const Card = ({ id, titulo }) => {
@@ -6,6 +46,10 @@ const Card = ({ id, titulo }) => {
     const [luminosidade, setLuminosidade] = useState(0);
     const [temperatura, setTemperatura] = useState(0);
     const [umidade, setUmidade] = useState(0);
+    const [historico, setHistorico] = useState({ luminosity: [], temperature: [], humidity: [] });
+    const [historicoAberto, setHistoricoAberto] = useState(false);
+    const [carregandoHistorico, setCarregandoHistorico] = useState(false);
+    const [erroHistorico, setErroHistorico] = useState("");
 
     const HEADERS_FIWARE = {
         "fiware-service": "smart",
@@ -209,6 +253,61 @@ const Card = ({ id, titulo }) => {
         }
     };
 
+    const exibirHistorico = async () => {
+        if (historicoAberto) {
+            setHistoricoAberto(false);
+            return;
+        }
+
+        if (!servidor.trim()) {
+            setErroHistorico("Configure o IP do servidor FIWARE antes de consultar o histórico.");
+            setHistoricoAberto(true);
+            return;
+        }
+
+        setHistoricoAberto(true);
+        setCarregandoHistorico(true);
+        setErroHistorico("");
+
+        const entidade = `urn:ngsi-ld:Lamp:${id}`;
+        const consultarAtributoHistorico = async (atributo) => {
+            const caminho = `/STH/v2/entities/${encodeURIComponent(entidade)}/attrs/${atributo}?type=Lamp&lastN=30`;
+            const resposta = await chamarFiware(caminho, {
+                method: "GET",
+                headers: { ...HEADERS_FIWARE, accept: "application/json" },
+            }, 8666);
+
+            if (!resposta.ok) {
+                const texto = await resposta.text();
+                throw new Error(`Falha ao consultar ${atributo} (${resposta.status}): ${texto}`);
+            }
+
+            const respostaJson = await resposta.json();
+            const valores = respostaJson.values ?? respostaJson.contextResponses
+                ?.flatMap((contexto) => contexto.contextElement?.attributes ?? [])
+                .find((item) => item.name === atributo)?.values ?? [];
+
+            return valores
+                .map((item) => ({ data: item.recvTime, valor: Number(item.attrValue) }))
+                .filter((item) => item.data && Number.isFinite(item.valor))
+                .sort((a, b) => new Date(a.data) - new Date(b.data));
+        };
+
+        try {
+            const [luminosity, temperature, humidity] = await Promise.all([
+                consultarAtributoHistorico("luminosity"),
+                consultarAtributoHistorico("temperature"),
+                consultarAtributoHistorico("humidity"),
+            ]);
+            setHistorico({ luminosity, temperature, humidity });
+        } catch (erro) {
+            console.error(erro);
+            setErroHistorico(erro.message || "Não foi possível carregar o histórico da AWS.");
+        } finally {
+            setCarregandoHistorico(false);
+        }
+    };
+
   return (
     <div className="">
         <div className="container-card ">
@@ -268,6 +367,23 @@ const Card = ({ id, titulo }) => {
                     </div>
                 </div>
             </div>
+            <button className="card__btn btn-cons btn-novo" onClick={exibirHistorico}>
+                {historicoAberto ? "Fechar histórico" : "Analisar histórico"}
+            </button>
+            {historicoAberto && (
+                <section className="historico-painel" aria-live="polite">
+                    <h2>Histórico — {titulo}</h2>
+                    {carregandoHistorico && <p>Buscando leituras na AWS...</p>}
+                    {erroHistorico && <p className="historico-erro">{erroHistorico}</p>}
+                    {!carregandoHistorico && !erroHistorico && (
+                        <div className="historico-graficos">
+                            <HistoricoGrafico titulo="Luminosidade" unidade="lx" pontos={historico.luminosity} cor="#fca22f" />
+                            <HistoricoGrafico titulo="Temperatura" unidade="°C" pontos={historico.temperature} cor="#ef6461" />
+                            <HistoricoGrafico titulo="Umidade" unidade="%" pontos={historico.humidity} cor="#55a8ff" />
+                        </div>
+                    )}
+                </section>
+            )}
         </div>
     </div>
     );

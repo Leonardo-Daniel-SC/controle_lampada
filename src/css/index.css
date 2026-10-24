@@ -367,3 +367,66 @@ html {
         width: 90%;
     }
 }
+
+.historico-painel {
+    width: 100%;
+    margin-top: 24px;
+    padding: 18px;
+    border: 1px solid #ffffff30;
+    border-radius: 12px;
+    background: #1d1d1d;
+    color: #ffffffca;
+}
+
+.historico-painel h2 {
+    margin: 0 0 16px;
+    font-size: 20px;
+}
+
+.historico-graficos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.historico-grafico {
+    min-width: 0;
+    padding: 12px;
+    border-radius: 10px;
+    background: #141414;
+}
+
+.historico-grafico h3 {
+    margin: 0 0 8px;
+    color: #fff;
+    font-size: 16px;
+}
+
+.historico-grafico svg {
+    display: block;
+    width: 100%;
+    overflow: visible;
+}
+
+.historico-eixo {
+    stroke: #ffffff40;
+    stroke-width: 1;
+}
+
+.historico-legenda {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+.historico-grafico small {
+    color: #ffffff9c;
+    font-size: 11px;
+}
+
+.historico-erro {
+    color: #ff8f8f;
+    overflow-wrap: anywhere;
+}
